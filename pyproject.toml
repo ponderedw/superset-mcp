@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "superset-mcp-server"
+version = "0.1.0"
+description = "An MCP server for Apache Superset that dynamically exposes API endpoints as tools."
+license = "MIT"
+authors = ["Hipposys"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mcp = {extras = ["cli"], version = "<2.0"}
+fastapi = "^0.115.0"
+uvicorn = "^0.34.0"
+requests = "^2.32.0"
+httpx = "^0.28.0"
+starlette = "^0.37.0"
+# Add your other dependencies here, such as open_api_spec_parser if it is a library
+# open_api_spec_parser = { path = "./open_api_spec_parser.py", develop = true }
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.urls]
+homepage = "https://github.com/your-org/your-repo"

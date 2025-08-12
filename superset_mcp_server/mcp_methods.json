@@ -1,0 +1,16 @@
+{
+    "mcp_methods": [
+        {
+            "method": "/api/v1/chart/",
+            "custom_description": "To retrive all the charts, pass {}"
+        },
+        {
+            "method": "/api/v1/advanced_data_type/types",
+            "custom_description": "That's a function that must be used!!!"
+        },
+        {
+            "method": "/api/v1/chart/_info",
+            "custom_description": "That's a function that must be used!!!"
+        }
+    ]
+}
