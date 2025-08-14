@@ -7,6 +7,8 @@ import json
 from typing import Dict, Any, Callable
 from functools import wraps
 
+from pathlib import Path
+
 # Assuming SupersetClient and open_api_spec_parser are in the same directory
 from .superset_client import SupersetClient
 from .open_api_spec_parser import OpenApiParser
@@ -32,8 +34,8 @@ async def auth_middleware(request: Request, call_next):
         try:
             response = await call_next(request)
             return response
-        except Exception:
-            raise
+        except Exception as e:
+            raise e
     else:
         raise HTTPException(
             status_code=HTTP_401_UNAUTHORIZED,
@@ -67,7 +69,7 @@ def register_superset_tools_dynamically(openapi_spec_path: str, mcp_methods_path
         parser = OpenApiParser(openapi_spec_path, mcp_methods_path)
         methods_data = parser.parse_methods()
     except FileNotFoundError as e:
-        return
+        raise e
 
     # Check for safe mode and only allow GET methods
     safe_mode = os.environ.get('SAFE_MODE', 'true').lower() == 'true'
@@ -126,8 +128,8 @@ def register_superset_tools_dynamically(openapi_spec_path: str, mcp_methods_path
             mcp.tool(name=func_name, description=full_description_string)(tool_function)
 
 # Assume the OpenAPI spec file and MCP methods file exist in the same directory
-OPENAPI_SPEC_PATH = 'superset_mcp_server/openapi_spec.json'
-MCP_METHODS_PATH = 'superset_mcp_server/mcp_methods.json'
+OPENAPI_SPEC_PATH = Path(__file__).parent / 'openapi_spec.json'
+MCP_METHODS_PATH = Path(__file__).parent / 'mcp_methods.json'
 register_superset_tools_dynamically(OPENAPI_SPEC_PATH, MCP_METHODS_PATH)
 
 # --- Main Function to Run the Server ---

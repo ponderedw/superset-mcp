@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "superset-mcp-server"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "An MCP server for Apache Superset that dynamically exposes API endpoints as tools."
 license = "MIT"
 authors = ["Hipposys"]

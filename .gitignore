@@ -2,3 +2,4 @@
 connect_to_the_superset_api.py
 .DS_Store
 __pycache__
+pgdata

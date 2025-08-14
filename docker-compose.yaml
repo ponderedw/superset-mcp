@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  superset:
+    networks:
+      data-lake-network:
+    build:
+      context: superset
+      dockerfile: Dockerfile
+    container_name: superset
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_NAME: superset
+      DATABASE_USER: superset
+      ADMIN_PASSWORD: superset
+      DATABASE_PASSWORD: superset
+    ports:
+      - "8088:8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      data-lake-network:
+    environment:
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: superset
+      PGDATA: /var/lib/postgresql/data/db-files/
+      POSTGRES_MULTIPLE_DATABASES: superset,postgres
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/db-files
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "superset"]
+      interval: 5s
+      retries: 5
+
+networks:
+  data-lake-network: 
