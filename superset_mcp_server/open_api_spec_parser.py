@@ -117,10 +117,12 @@ class OpenApiParser:
                         response_description = ''
                         short_description = method_spec.get('summary', '')
                         full_description = method_spec.get('description', '')
-                        example_request = {}
+                        
+                        example_request_payload = {}
 
                         # Extract parameters and build example request
                         parameters = method_spec.get('parameters', [])
+                        
                         for param in parameters:
                             param_details = {
                                 "name": param.get("name"),
@@ -130,7 +132,6 @@ class OpenApiParser:
                                 "schema": {}
                             }
                             
-                            # Handle schema defined within 'content'
                             schema_obj = {}
                             if "content" in param and "application/json" in param["content"]:
                                 schema_obj = param["content"]["application/json"].get("schema", {})
@@ -141,10 +142,12 @@ class OpenApiParser:
                                 ref = schema_obj["$ref"]
                                 resolved_schema = self._get_schema_details(ref)
                                 param_details["schema"] = resolved_schema
-                                if param.get("in") == "query" and param.get("name") == "q":
-                                    example_request = self._generate_example_from_schema(resolved_schema)
+                                if param.get("in") == "query":
+                                    example_request_payload[param.get("name")] = self._generate_example_from_schema(resolved_schema)
                             else:
                                 param_details["schema"] = schema_obj
+                                if param.get("in") == "query":
+                                    example_request_payload[param.get("name")] = self._generate_example_from_schema(schema_obj)
 
                             parameters_list.append(param_details)
 
@@ -169,9 +172,9 @@ class OpenApiParser:
                                 if '$ref' in schema_obj:
                                     ref = schema_obj['$ref']
                                     resolved_schema = self._get_schema_details(ref)
-                                    example_request = self._generate_example_from_schema(resolved_schema)
+                                    example_request_payload = self._generate_example_from_schema(resolved_schema)
                                 else:
-                                    example_request = self._generate_example_from_schema(schema_obj)
+                                    example_request_payload = self._generate_example_from_schema(schema_obj)
 
                         parsed_methods.append({
                             "method": method_path,
@@ -182,41 +185,6 @@ class OpenApiParser:
                             "response_schema": response_schema,
                             "response_description": response_description,
                             "custom_description": custom_description,
-                            "example_request": example_request
+                            "example_request": example_request_payload
                         })
         return parsed_methods
-
-if __name__ == '__main__':
-    try:
-        # Assuming the files are in the same directory as the script
-        OPENAPI_SPEC_PATH = 'openapi_spec.json'
-        MCP_METHODS_PATH = 'mcp_methods.json'
-
-        parser = OpenApiParser(OPENAPI_SPEC_PATH, MCP_METHODS_PATH)
-        methods_data = parser.parse_methods()
-
-        # Print the extracted data in a readable format
-        for method_data in methods_data:
-            print(f"Method: {method_data['method']}")
-            print(f"  Method Type: {method_data['method_type']}")
-            print(f"  Short Description: {method_data['short_description']}")
-            print(f"  Full Description: {method_data['full_description']}")
-            print(f"  Custom Description: {method_data['custom_description']}")
-            print("  Parameters:")
-            if method_data['parameters']:
-                for param in method_data['parameters']:
-                    print(f"    - Name: {param['name']}, In: {param['in']}, Required: {param['required']}")
-                    print(f"      Schema: {json.dumps(param['schema'], indent=8)}")
-            else:
-                print("    (None)")
-            print("  Response (200):")
-            print(f"    Description: {method_data['response_description']}")
-            print(f"    Schema: {json.dumps(method_data['response_schema'], indent=8)}")
-            print("  Example Request:")
-            print(f"    {json.dumps(method_data['example_request'], indent=8)}")
-            print("-" * 50)
-
-    except FileNotFoundError as e:
-        print(e)
-    except json.JSONDecodeError as e:
-        print(f"Error decoding JSON: {e}")

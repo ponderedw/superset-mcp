@@ -1,4 +1,3 @@
-# Use a slim Python image for a smaller footprint
 FROM python:3.12-slim
 
 # Set environment variables for Poetry and Python
@@ -28,4 +27,4 @@ RUN poetry install --no-root
 EXPOSE 8000
 
 # Run the application using the poetry run command to ensure dependencies are loaded correctly.
-CMD ["poetry", "run", "python", "superset_mcp_server/mcp_server.py"]
+CMD ["poetry", "run", "python", "-m", "superset_mcp_server.mcp_server"]
