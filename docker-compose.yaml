@@ -39,5 +39,22 @@ services:
       interval: 5s
       retries: 5
 
+  sql-executor:
+    build:
+      context: .
+      dockerfile: Dockerfile.sql-executor
+    container_name: sql_executor
+    networks:
+      data-lake-network:
+    environment:
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: superset
+      POSTGRES_DATABASE: postgres
+      POSTGRES_HOST: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
 networks:
   data-lake-network: 

@@ -1,0 +1,47 @@
+# Use official PostgreSQL client image
+FROM postgres:15
+
+# Install additional tools if needed
+RUN apt-get update && apt-get install -y bash && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables with defaults
+ENV POSTGRES_USER=superset
+ENV POSTGRES_PASSWORD=superset
+ENV POSTGRES_DATABASE=postgres
+ENV POSTGRES_HOST=postgres
+
+# Create a directory for SQL scripts
+WORKDIR /sql
+
+# Copy the SQL file
+COPY dashboard_data.sql /sql/
+
+# Create a script to execute the SQL file
+RUN cat > /sql/execute_sql.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "Waiting for PostgreSQL to be ready..."
+until pg_isready -h "$POSTGRES_HOST" -U "$POSTGRES_USER"; do
+  echo "PostgreSQL is unavailable - sleeping"
+  sleep 2
+done
+
+echo "PostgreSQL is ready!"
+echo "Executing dashboard_data.sql..."
+
+# Execute the SQL file
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DATABASE" \
+  -f /sql/dashboard_data.sql
+
+echo "SQL execution completed successfully!"
+EOF
+
+# Make the script executable
+RUN chmod +x /sql/execute_sql.sh
+
+# Set the default command
+CMD ["/sql/execute_sql.sh"]
