@@ -83,19 +83,17 @@ class SupersetClient:
 
         payload = self.encode_dict_values(payload)
 
-        try:
-            if method_type.lower() == 'get':
-                # GET requests use params for query parameters
-                response = request_func(url, params=payload if payload else None, headers=self.headers)
-            elif method_type.lower() == 'delete':
-                # DELETE requests use params for query parameters (for bulk delete)
-                response = request_func(url, params=payload if payload else None, headers=self.headers)
-            else:
-                # POST, PUT, etc. requests use the json parameter for the request body
-                response = request_func(url, json=payload, headers=self.headers)
+        if method_type.lower() == 'get':
+            # GET requests use params for query parameters
+            response = request_func(url, params=payload if payload else None, headers=self.headers)
+        elif method_type.lower() == 'delete':
+            # DELETE requests use params for query parameters (for bulk delete)
+            response = request_func(url, params=payload if payload else None, headers=self.headers)
+        else:
+            # POST, PUT, etc. requests use the json parameter for the request body
+            response = request_func(url, json=payload, headers=self.headers)
 
-            response.raise_for_status()
+        response.raise_for_status()
+        
+        return response.json()
             
-            return response.json()
-        except requests.exceptions.RequestException:
-            return None
