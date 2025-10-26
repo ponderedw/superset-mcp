@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "superset-mcp-server"
-version = "0.1.0a5"
+version = "0.1.0a6"
 description = "An MCP server for Apache Superset that dynamically exposes API endpoints as tools."
 license = "MIT"
-authors = ["Hipposys"]
+authors = ["Ponder"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -20,4 +20,4 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.urls]
-homepage = "https://github.com/your-org/your-repo"
+homepage = "https://github.com/ponderedw/superset-mcp"

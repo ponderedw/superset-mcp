@@ -62,7 +62,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: hipposysai/superset-mcp:latest,hipposysai/superset-mcp:${{ steps.timestamp.outputs.timestamp }}
+          tags: pondered/superset-mcp:latest,pondered/superset-mcp:${{ steps.timestamp.outputs.timestamp }}
           platforms: linux/amd64,linux/arm64
 
   publish_mcp_library:
